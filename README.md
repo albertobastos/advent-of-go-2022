@@ -7,7 +7,7 @@ To run day D execute:
 
 ~~~
 cd D
-go run D.go
+./run.sh
 ~~~
 
 Cheers to Stephen Grider's course

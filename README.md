@@ -10,6 +10,19 @@ cd D
 ./run.sh
 ~~~
 
+To run day D tests:
+
+~~~
+cd D
+./go test
+~~~
+
+To create a new day module:
+
+~~~
+./create.sh D
+~~
+
 Cheers to Stephen Grider's course
 [Go: The Complete Developer's Guide](https://udemy.com/course/go-the-complete-developers-guide/) 
 available at [Udemy](https://www.udemy.com/).

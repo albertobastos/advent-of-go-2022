@@ -5,8 +5,8 @@ import (
 	"os"
 )
 
-func doPart1() int {
-	plays := p1_readFile()
+func doPart1(file string) int {
+	plays := p1_readFile(file)
 	points := 0
 	for _, play := range plays {
 		points += p1_calculatePoints(play)
@@ -14,8 +14,8 @@ func doPart1() int {
 	return points
 }
 
-func p1_readFile() []Play {
-	readFile, _ := os.Open("input.txt")
+func p1_readFile(file string) []Play {
+	readFile, _ := os.Open(file)
 	scanner := bufio.NewScanner(readFile)
 	scanner.Split(bufio.ScanLines)
 	plays := []Play{}

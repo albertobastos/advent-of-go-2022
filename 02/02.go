@@ -21,9 +21,14 @@ type Play struct {
 	result   int
 }
 
+func run(file string) (int, int) {
+	return doPart1(file), doPart2(file)
+}
+
 func main() {
-	fmt.Println("Part 1 =", doPart1())
-	fmt.Println("Part 2 =", doPart2())
+	part1, part2 := run("input.txt")
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
 }
 
 func readOpponent(c byte) int {

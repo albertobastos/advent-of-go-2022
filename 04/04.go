@@ -11,8 +11,8 @@ import (
 type Coverage [2]int
 type Pair [2]Coverage
 
-func readFile() []Pair {
-	readFile, _ := os.Open("input.txt")
+func readFile(file string) []Pair {
+	readFile, _ := os.Open(file)
 	scanner := bufio.NewScanner(readFile)
 	scanner.Split(bufio.ScanLines)
 	pairs := []Pair{}
@@ -85,14 +85,19 @@ func min_int(a int, b int) int {
 	}
 }
 
-func main() {
-	pairs := readFile()
+func run(file string) (int, int) {
+	pairs := readFile(file)
 	fullOverlaps := 0
 	someOverlaps := 0
 	for _, pair := range pairs {
 		fullOverlaps += pair.hasFullOverlap()
 		someOverlaps += pair.hasSomeOverlap()
 	}
-	fmt.Println("Part1:", fullOverlaps)
-	fmt.Println("Part2:", someOverlaps)
+	return fullOverlaps, someOverlaps
+}
+
+func main() {
+	part1, part2 := run("input.txt")
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
 }

@@ -11,8 +11,8 @@ const GROUP_SIZE = 3
 type Elf string
 type BadgeMap map[rune]bool
 
-func doPart2() int {
-	elves := p2_readFile()
+func doPart2(file string) int {
+	elves := p2_readFile(file)
 	sum := 0
 	for i := 0; i < len(elves); i = i + GROUP_SIZE {
 		sum += int(priority(findBadge(elves[i : i+GROUP_SIZE])))
@@ -20,8 +20,8 @@ func doPart2() int {
 	return sum
 }
 
-func p2_readFile() []Elf {
-	readFile, _ := os.Open("input.txt")
+func p2_readFile(file string) []Elf {
+	readFile, _ := os.Open(file)
 	scanner := bufio.NewScanner(readFile)
 	scanner.Split(bufio.ScanLines)
 

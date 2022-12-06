@@ -11,8 +11,8 @@ type Rucksack struct {
 	pocket2 *Pocket
 }
 
-func doPart1() int {
-	rucksacks := p1_readFile()
+func doPart1(file string) int {
+	rucksacks := p1_readFile(file)
 	sum := 0
 	for _, r := range rucksacks {
 		for _, p := range r.findCommon() {
@@ -22,8 +22,8 @@ func doPart1() int {
 	return sum
 }
 
-func p1_readFile() []Rucksack {
-	readFile, _ := os.Open("input.txt")
+func p1_readFile(file string) []Rucksack {
+	readFile, _ := os.Open(file)
 	scanner := bufio.NewScanner(readFile)
 	scanner.Split(bufio.ScanLines)
 

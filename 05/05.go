@@ -13,8 +13,8 @@ type Move string
 
 var RE_NUM *regexp.Regexp
 
-func readFile() ([]Stack, []Move) {
-	readFile, _ := os.Open("input.txt")
+func readFile(file string) ([]Stack, []Move) {
+	readFile, _ := os.Open(file)
 	scanner := bufio.NewScanner(readFile)
 	scanner.Split(bufio.ScanLines)
 	var stacks []Stack
@@ -107,14 +107,19 @@ func formatTops(stacks []Stack) string {
 	return tops
 }
 
-func main() {
+func run(file string) (string, string) {
 	RE_NUM = regexp.MustCompile("[0-9]+")
-	stacks_part1, moves := readFile()
-	stacks_part2, _ := readFile()
+	stacks_part1, moves := readFile(file)
+	stacks_part2, _ := readFile(file)
 	for _, move := range moves {
 		applyMove_mover9000(stacks_part1, move)
 		applyMove_mover9001(stacks_part2, move)
 	}
-	fmt.Println("Part1:", formatTops(stacks_part1))
-	fmt.Println("Part2:", formatTops(stacks_part2))
+	return formatTops(stacks_part1), formatTops(stacks_part2)
+}
+
+func main() {
+	part1, part2 := run("input.txt")
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
 }

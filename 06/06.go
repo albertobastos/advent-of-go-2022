@@ -8,8 +8,8 @@ import (
 const PMARKER_LEN = 4
 const MMARKER_LEN = 14
 
-func readFile() string {
-	data, _ := os.ReadFile("input.txt")
+func readFile(file string) string {
+	data, _ := os.ReadFile(file)
 	return string(data)
 }
 
@@ -44,8 +44,13 @@ func allUnique(str string) bool {
 	return true
 }
 
+func run(input string) (int, int) {
+	return findPacketStart(input) + PMARKER_LEN,
+		findMessageStart(input) + MMARKER_LEN
+}
+
 func main() {
-	input := readFile()
-	fmt.Println("Part1:", findPacketStart(input)+PMARKER_LEN)
-	fmt.Println("Part2:", findMessageStart(input)+MMARKER_LEN)
+	part1, part2 := run(readFile("input.txt"))
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
 }

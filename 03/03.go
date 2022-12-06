@@ -4,9 +4,14 @@ import "fmt"
 
 type Priority uint8
 
+func run(file string) (int, int) {
+	return doPart1(file), doPart2(file)
+}
+
 func main() {
-	fmt.Println("Part1 =", doPart1())
-	fmt.Println("Part2 =", doPart2())
+	part1, part2 := run("input.txt")
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
 }
 
 func priority(c rune) Priority {

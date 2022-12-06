@@ -8,21 +8,29 @@ import (
 	"strconv"
 )
 
-func main() {
-	elves := readFile()
+func run(file string) (int, int) {
+	elves := readFile(file)
 	sort.Ints(elves)
 
-	fmt.Println("Part1:", elves[len(elves)-1], "calories.")
+	part1 := elves[len(elves)-1]
 
 	sum := 0
 	for _, calories := range elves[len(elves)-3:] {
 		sum += calories
 	}
-	fmt.Println("Part2:", sum, "calories.")
+	part2 := sum
+
+	return part1, part2
 }
 
-func readFile() []int {
-	readFile, _ := os.Open("input.txt")
+func main() {
+	part1, part2 := run("input.txt")
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
+}
+
+func readFile(file string) []int {
+	readFile, _ := os.Open(file)
 	scanner := bufio.NewScanner(readFile)
 	scanner.Split(bufio.ScanLines)
 	accs := []int{0}

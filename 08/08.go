@@ -7,10 +7,6 @@ import (
 	"strconv"
 )
 
-type Comparable interface {
-	int8 | int
-}
-
 type Tree struct {
 	height int8
 

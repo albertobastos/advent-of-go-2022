@@ -164,7 +164,6 @@ func doPart2(root *Entry) int {
 func run(file string) (int, int) {
 	root := readFile(file)
 	//root.print()
-	// TODO
 	return doPart1(root), doPart2(root)
 }
 

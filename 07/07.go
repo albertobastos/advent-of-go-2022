@@ -33,6 +33,18 @@ type Entry struct {
 	size     int
 }
 
+func main() {
+	part1, part2 := run("input.txt")
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
+}
+
+func run(file string) (int, int) {
+	root := readFile(file)
+	//root.print()
+	return doPart1(root), doPart2(root)
+}
+
 func readFile(file string) *Entry {
 	readFile, _ := os.Open(file)
 	scanner := bufio.NewScanner(readFile)
@@ -117,25 +129,6 @@ func (e *Entry) _print(pfx string) {
 	}
 }
 
-func (e *Entry) findSmallestRequired(r int) *Entry {
-	if !e.isDir {
-		return nil
-	}
-	var min *Entry
-	if e.size > r {
-		min = e
-	}
-	for _, c := range e.children {
-		cmin := c.findSmallestRequired(r)
-		if min == nil {
-			min = cmin
-		} else if cmin != nil && cmin.size < min.size {
-			min = cmin
-		}
-	}
-	return min
-}
-
 func doPart1(e *Entry) int {
 	if !e.isDir {
 		return 0
@@ -161,14 +154,21 @@ func doPart2(root *Entry) int {
 	}
 }
 
-func run(file string) (int, int) {
-	root := readFile(file)
-	//root.print()
-	return doPart1(root), doPart2(root)
-}
-
-func main() {
-	part1, part2 := run("input.txt")
-	fmt.Println("Part1:", part1)
-	fmt.Println("Part2:", part2)
+func (e *Entry) findSmallestRequired(r int) *Entry {
+	if !e.isDir {
+		return nil
+	}
+	var min *Entry
+	if e.size > r {
+		min = e
+	}
+	for _, c := range e.children {
+		cmin := c.findSmallestRequired(r)
+		if min == nil {
+			min = cmin
+		} else if cmin != nil && cmin.size < min.size {
+			min = cmin
+		}
+	}
+	return min
 }

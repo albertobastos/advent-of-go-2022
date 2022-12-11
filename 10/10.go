@@ -43,6 +43,37 @@ func (i addx) cycles() int {
 	return 2
 }
 
+func main() {
+	part1, part2 := run("input.txt")
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:")
+	for _, l := range part2 {
+		fmt.Println(l)
+	}
+}
+
+func run(file string) (int, []string) {
+	lines := readFile(file)
+	machine := initMachine()
+	part1 := exec(machine, lines)
+	part2 := machine.getDisplay()
+	return part1, part2
+}
+
+func readFile(file string) []string {
+	readFile, _ := os.Open(file)
+	scanner := bufio.NewScanner(readFile)
+	scanner.Split(bufio.ScanLines)
+
+	lines := []string{}
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	readFile.Close()
+	return lines
+}
+
 func initMachine() *Machine {
 	m := Machine{}
 	m.reset()
@@ -56,21 +87,6 @@ func (m *Machine) reset() {
 	for i := 0; i < DISPLAY_PIXELS; i++ {
 		m.display = append(m.display, '.')
 	}
-}
-
-func (m *Machine) updateDisplay() {
-	col := m.cycles % DISPLAY_COLS
-	if m.register >= col-1 && m.register <= col+1 {
-		m.display[m.cycles] = '#'
-	}
-}
-
-func (m *Machine) getDisplay() []string {
-	d := []string{}
-	for row := 0; row < DISPLAY_ROWS; row++ {
-		d = append(d, string(m.display[row*DISPLAY_COLS:(row+1)*DISPLAY_COLS]))
-	}
-	return d
 }
 
 func exec(m *Machine, instrs []string) int {
@@ -101,33 +117,17 @@ func parseInstruction(str string) Instruction {
 	}
 }
 
-func readFile(file string) []string {
-	readFile, _ := os.Open(file)
-	scanner := bufio.NewScanner(readFile)
-	scanner.Split(bufio.ScanLines)
-
-	lines := []string{}
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
+func (m *Machine) updateDisplay() {
+	col := m.cycles % DISPLAY_COLS
+	if m.register >= col-1 && m.register <= col+1 {
+		m.display[m.cycles] = '#'
 	}
-
-	readFile.Close()
-	return lines
 }
 
-func run(file string) (int, []string) {
-	lines := readFile(file)
-	machine := initMachine()
-	part1 := exec(machine, lines)
-	part2 := machine.getDisplay()
-	return part1, part2
-}
-
-func main() {
-	part1, part2 := run("input.txt")
-	fmt.Println("Part1:", part1)
-	fmt.Println("Part2:")
-	for _, l := range part2 {
-		fmt.Println(l)
+func (m *Machine) getDisplay() []string {
+	d := []string{}
+	for row := 0; row < DISPLAY_ROWS; row++ {
+		d = append(d, string(m.display[row*DISPLAY_COLS:(row+1)*DISPLAY_COLS]))
 	}
+	return d
 }

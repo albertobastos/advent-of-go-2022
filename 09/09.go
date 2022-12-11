@@ -28,8 +28,16 @@ type Move struct {
 	n   int
 }
 
-func (xy *XY) toKey() string {
-	return fmt.Sprintf("%d,%d", xy.x, xy.y)
+func main() {
+	fmt.Println("Part1:", run("input.txt", 2))
+	fmt.Println("Part2:", run("input.txt", 10))
+}
+
+func run(file string, knots int) int {
+	moves := readFile(file)
+	state := initState(knots)
+	state.runMoves(moves)
+	return len(state.visited_tail)
 }
 
 func readFile(file string) []Move {
@@ -50,8 +58,13 @@ func readFile(file string) []Move {
 	return moves
 }
 
-func (s *State) updateVisited() {
-	s.visited_tail[s.knots[len(s.knots)-1].toKey()] = true
+func initState(knots int) *State {
+	s := State{
+		knots:        initKnots(knots),
+		visited_tail: make(map[string]bool),
+	}
+	s.updateVisited()
+	return &s
 }
 
 func initKnots(knots int) []XY {
@@ -62,36 +75,12 @@ func initKnots(knots int) []XY {
 	return k
 }
 
-func initState(knots int) *State {
-	s := State{
-		knots:        initKnots(knots),
-		visited_tail: make(map[string]bool),
-	}
-	s.updateVisited()
-	return &s
+func (s *State) updateVisited() {
+	s.visited_tail[s.knots[len(s.knots)-1].toKey()] = true
 }
 
-func (m Move) getDeltas() (int, int) {
-	if m.dir == RIGHT {
-		return 1, 0
-	} else if m.dir == UP {
-		return 0, 1
-	} else if m.dir == LEFT {
-		return -1, 0
-	} else if m.dir == DOWN {
-		return 0, -1
-	}
-	fmt.Println("Invalid move:", m)
-	os.Exit(1)
-	return 0, 0
-}
-
-func (s *State) getHead() *XY {
-	return s.getKnotAt(0)
-}
-
-func (s *State) getKnotAt(i int) *XY {
-	return &s.knots[i]
+func (xy *XY) toKey() string {
+	return fmt.Sprintf("%d,%d", xy.x, xy.y)
 }
 
 func (s *State) runMoves(moves []Move) {
@@ -110,27 +99,26 @@ func (s *State) runMoves(moves []Move) {
 	}
 }
 
-func (s *State) print() {
-	fmt.Println("State:")
-	for i, k := range s.knots {
-		label := fmt.Sprint(i)
-		if i == 0 {
-			label = "H"
-		}
-		fmt.Println("knot", label, "[", k.x, k.y, "]")
-	}
-	fmt.Println()
+func (s *State) getHead() *XY {
+	return s.getKnotAt(0)
 }
 
-func getDelta(from int, to int) int {
-	dist := from - to
-	if dist < 0 {
-		return -1
-	} else if dist > 0 {
-		return 1
-	} else {
-		return 0
+func (s *State) getKnotAt(i int) *XY {
+	return &s.knots[i]
+}
+func (m Move) getDeltas() (int, int) {
+	if m.dir == RIGHT {
+		return 1, 0
+	} else if m.dir == UP {
+		return 0, 1
+	} else if m.dir == LEFT {
+		return -1, 0
+	} else if m.dir == DOWN {
+		return 0, -1
 	}
+	fmt.Println("Invalid move:", m)
+	os.Exit(1)
+	return 0, 0
 }
 
 func (s *State) maybeMove(head *XY, tail *XY) bool {
@@ -150,14 +138,25 @@ func (s *State) maybeMove(head *XY, tail *XY) bool {
 	}
 }
 
-func run(file string, knots int) int {
-	moves := readFile(file)
-	state := initState(knots)
-	state.runMoves(moves)
-	return len(state.visited_tail)
+func getDelta(from int, to int) int {
+	dist := from - to
+	if dist < 0 {
+		return -1
+	} else if dist > 0 {
+		return 1
+	} else {
+		return 0
+	}
 }
 
-func main() {
-	fmt.Println("Part1:", run("input.txt", 2))
-	fmt.Println("Part2:", run("input.txt", 10))
+func (s *State) print() {
+	fmt.Println("State:")
+	for i, k := range s.knots {
+		label := fmt.Sprint(i)
+		if i == 0 {
+			label = "H"
+		}
+		fmt.Println("knot", label, "[", k.x, k.y, "]")
+	}
+	fmt.Println()
 }

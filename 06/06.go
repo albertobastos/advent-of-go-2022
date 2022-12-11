@@ -8,9 +8,28 @@ import (
 const PMARKER_LEN = 4
 const MMARKER_LEN = 14
 
+func main() {
+	part1, part2 := run(readFile("input.txt"))
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
+}
+
 func readFile(file string) string {
 	data, _ := os.ReadFile(file)
 	return string(data)
+}
+
+func run(input string) (int, int) {
+	return findPacketStart(input) + PMARKER_LEN,
+		findMessageStart(input) + MMARKER_LEN
+}
+
+func findPacketStart(str string) int {
+	return _findStart(str, PMARKER_LEN)
+}
+
+func findMessageStart(str string) int {
+	return _findStart(str, MMARKER_LEN)
 }
 
 func _findStart(str string, ml int) int {
@@ -25,14 +44,6 @@ func _findStart(str string, ml int) int {
 	return -1
 }
 
-func findPacketStart(str string) int {
-	return _findStart(str, PMARKER_LEN)
-}
-
-func findMessageStart(str string) int {
-	return _findStart(str, MMARKER_LEN)
-}
-
 func allUnique(str string) bool {
 	set := make(map[rune]bool)
 	for _, c := range str {
@@ -42,15 +53,4 @@ func allUnique(str string) bool {
 		set[c] = true
 	}
 	return true
-}
-
-func run(input string) (int, int) {
-	return findPacketStart(input) + PMARKER_LEN,
-		findMessageStart(input) + MMARKER_LEN
-}
-
-func main() {
-	part1, part2 := run(readFile("input.txt"))
-	fmt.Println("Part1:", part1)
-	fmt.Println("Part2:", part2)
 }

@@ -6,6 +6,19 @@ import (
 	"os"
 )
 
+func main() {
+	part1, part2 := run("input.txt")
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
+}
+
+func run(file string) (int, int) {
+	input := readFile(file)
+	// TODO
+	fmt.Println(input)
+	return -1, -1
+}
+
 func readFile(file string) string {
 	readFile, _ := os.Open(file)
 	scanner := bufio.NewScanner(readFile)
@@ -18,17 +31,4 @@ func readFile(file string) string {
 
 	readFile.Close()
 	return "TODO"
-}
-
-func run(file string) (int, int) {
-	input := readFile(file)
-	// TODO
-	fmt.Println(input)
-	return -1, -1
-}
-
-func main() {
-	part1, part2 := run("input.txt")
-	fmt.Println("Part1:", part1)
-	fmt.Println("Part2:", part2)
 }

@@ -11,6 +11,23 @@ import (
 type Coverage [2]int
 type Pair [2]Coverage
 
+func main() {
+	part1, part2 := run("input.txt")
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
+}
+
+func run(file string) (int, int) {
+	pairs := readFile(file)
+	fullOverlaps := 0
+	someOverlaps := 0
+	for _, pair := range pairs {
+		fullOverlaps += pair.hasFullOverlap()
+		someOverlaps += pair.hasSomeOverlap()
+	}
+	return fullOverlaps, someOverlaps
+}
+
 func readFile(file string) []Pair {
 	readFile, _ := os.Open(file)
 	scanner := bufio.NewScanner(readFile)
@@ -43,14 +60,6 @@ func readFile(file string) []Pair {
 	return pairs
 }
 
-func (c Coverage) from() int {
-	return c[0]
-}
-
-func (c Coverage) to() int {
-	return c[1]
-}
-
 func (p Pair) hasFullOverlap() int {
 	if p[0].from() >= p[1].from() && p[0].to() <= p[1].to() {
 		return 1
@@ -69,35 +78,10 @@ func (p Pair) hasSomeOverlap() int {
 	}
 }
 
-func max_int(a int, b int) int {
-	if a > b {
-		return a
-	} else {
-		return b
-	}
+func (c Coverage) from() int {
+	return c[0]
 }
 
-func min_int(a int, b int) int {
-	if a < b {
-		return a
-	} else {
-		return b
-	}
-}
-
-func run(file string) (int, int) {
-	pairs := readFile(file)
-	fullOverlaps := 0
-	someOverlaps := 0
-	for _, pair := range pairs {
-		fullOverlaps += pair.hasFullOverlap()
-		someOverlaps += pair.hasSomeOverlap()
-	}
-	return fullOverlaps, someOverlaps
-}
-
-func main() {
-	part1, part2 := run("input.txt")
-	fmt.Println("Part1:", part1)
-	fmt.Println("Part2:", part2)
+func (c Coverage) to() int {
+	return c[1]
 }

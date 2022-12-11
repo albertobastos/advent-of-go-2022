@@ -20,6 +20,42 @@ type Tree struct {
 
 type Forest [][]*Tree
 
+func main() {
+	part1, part2 := run("input.txt")
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
+}
+
+func run(file string) (int, int) {
+	forest := readFile(file)
+	forest.calculateAll()
+	part1 := forest.countVisible()
+	part2 := forest.getMaxScore()
+	return part1, part2
+}
+
+func readFile(file string) Forest {
+	readFile, _ := os.Open(file)
+	scanner := bufio.NewScanner(readFile)
+	scanner.Split(bufio.ScanLines)
+
+	var f Forest
+	row := 0
+	for scanner.Scan() {
+		line := scanner.Text()
+		if f == nil {
+			f = initForest(len(line))
+		}
+		for col, hstr := range line {
+			f.initTree(row, col, hstr)
+		}
+		row++
+	}
+
+	readFile.Close()
+	return f
+}
+
 func initForest(size int) Forest {
 	f := make(Forest, size)
 	for i := 0; i < size; i++ {
@@ -33,13 +69,6 @@ func initForest(size int) Forest {
 func (f Forest) initTree(row int, col int, height_str rune) {
 	height, _ := strconv.Atoi(string(height_str))
 	f[row][col] = &Tree{height: int8(height)}
-}
-
-func (f Forest) treeAt(row int, col int) *Tree {
-	if row < 0 || col < 0 || row >= len(f) || col >= len(f) {
-		return nil
-	}
-	return f[row][col]
 }
 
 func (f Forest) calculateAll() {
@@ -191,46 +220,4 @@ func (f Forest) print(title string, fn func(t *Tree) int8) {
 		}
 		fmt.Printf("\n")
 	}
-}
-
-func readFile(file string) Forest {
-	readFile, _ := os.Open(file)
-	scanner := bufio.NewScanner(readFile)
-	scanner.Split(bufio.ScanLines)
-
-	var f Forest
-	row := 0
-	for scanner.Scan() {
-		line := scanner.Text()
-		if f == nil {
-			f = initForest(len(line))
-		}
-		for col, hstr := range line {
-			f.initTree(row, col, hstr)
-		}
-		row++
-	}
-
-	readFile.Close()
-	return f
-}
-
-func run(file string) (int, int) {
-	forest := readFile(file)
-	forest.calculateAll()
-	// forest.print("Heights", func(t *Tree) int8 { return int8(t.height) })
-	// forest.print("MaxNorth", func(t *Tree) int8 { return int8(t.mnorth) })
-	// forest.print("MaxEast", func(t *Tree) int8 { return int8(t.meast) })
-	// forest.print("MaxSouth", func(t *Tree) int8 { return int8(t.vsouth) })
-	// forest.print("MaxWest", func(t *Tree) int8 { return int8(t.mwest) })
-	// forest.print("Scores", func(t *Tree) int8 { return int8(t.score) })
-	part1 := forest.countVisible()
-	part2 := forest.getMaxScore()
-	return part1, part2
-}
-
-func main() {
-	part1, part2 := run("input.txt")
-	fmt.Println("Part1:", part1)
-	fmt.Println("Part2:", part2)
 }

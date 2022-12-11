@@ -8,6 +8,12 @@ import (
 	"strconv"
 )
 
+func main() {
+	part1, part2 := run("input.txt")
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
+}
+
 func run(file string) (int, int) {
 	elves := readFile(file)
 	sort.Ints(elves)
@@ -21,12 +27,6 @@ func run(file string) (int, int) {
 	part2 := sum
 
 	return part1, part2
-}
-
-func main() {
-	part1, part2 := run("input.txt")
-	fmt.Println("Part1:", part1)
-	fmt.Println("Part2:", part2)
 }
 
 func readFile(file string) []int {

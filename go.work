@@ -1,0 +1,13 @@
+go 1.19
+
+use ./01
+use ./02
+use ./03
+use ./04
+use ./05
+use ./06
+use ./07
+use ./08
+use ./09
+use ./10
+use ./11

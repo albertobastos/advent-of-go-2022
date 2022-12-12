@@ -30,7 +30,7 @@ func run(file string) (int, int) {
 	part1 := s.distances[s.end]
 
 	s.reset()
-	lowest := int('a') - '0'
+	lowest := runeToHeight('a')
 	for i, h := range s.heights {
 		if h == lowest {
 			s.distances[i] = 0

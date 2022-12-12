@@ -13,5 +13,5 @@ func _Test(file string, part1exp int, part2exp int, t *testing.T) {
 }
 
 func TestDemo(t *testing.T) {
-	_Test("demo.txt", 31, -1, t)
+	_Test("demo.txt", 31, 29, t)
 }

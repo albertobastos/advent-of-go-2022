@@ -26,22 +26,20 @@ func main() {
 
 func run(file string) (int, int) {
 	s := readFile(file)
-	for {
-		curr := getNextCandidate(s)
-		if curr == -1 {
-			break
+	s.fillDistances()
+	part1 := s.distances[s.end]
+
+	s.reset()
+	lowest := int('a') - '0'
+	for i, h := range s.heights {
+		if h == lowest {
+			s.distances[i] = 0
 		}
-		newd := s.distances[curr] + 1
-		for _, move := range getMovementsFrom(s, curr) {
-			if s.distances[move] > newd {
-				s.distances[move] = newd
-			}
-		}
-		s.visited[curr] = true
-		//s.printVisited()
-		//s.printDistances()
 	}
-	return s.distances[s.end], -1
+	s.fillDistances()
+	part2 := s.distances[s.end]
+
+	return part1, part2
 }
 
 func readFile(file string) *State {
@@ -133,6 +131,32 @@ func (s *State) print(title string, fn func(*State, int) string) {
 		}
 	}
 	fmt.Println()
+}
+
+func (s *State) fillDistances() {
+	for {
+		curr := getNextCandidate(s)
+		if curr == -1 {
+			break
+		}
+		newd := s.distances[curr] + 1
+		for _, move := range getMovementsFrom(s, curr) {
+			if s.distances[move] > newd {
+				s.distances[move] = newd
+			}
+		}
+		s.visited[curr] = true
+		//s.printVisited()
+		//s.printDistances()
+	}
+}
+
+func (s *State) reset() {
+	for i, _ := range s.heights {
+		s.distances[i] = INFINITY
+		s.visited[i] = false
+	}
+	s.distances[s.start] = 0
 }
 
 func (s *State) printDistances() {

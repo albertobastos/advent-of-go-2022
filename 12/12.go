@@ -47,11 +47,15 @@ func readFile(file string) *State {
 	scanner := bufio.NewScanner(readFile)
 	scanner.Split(bufio.ScanLines)
 
-	s := State{[]int{}, []int{}, []bool{}, -1, -1, -1}
+	s := State{
+		heights:   []int{},
+		distances: []int{},
+		visited:   []bool{},
+	}
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		if s.width == -1 {
+		if s.width == 0 {
 			s.width = len(line)
 		}
 		for _, c := range line {

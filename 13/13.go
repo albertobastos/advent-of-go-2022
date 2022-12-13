@@ -16,11 +16,6 @@ func (i *Item) isList() bool {
 	return i.valueList != nil
 }
 
-type Pair struct {
-	first  *Item
-	second *Item
-}
-
 func main() {
 	part1, part2 := run("input.txt")
 	fmt.Println("Part1:", part1)
@@ -28,27 +23,23 @@ func main() {
 }
 
 func run(file string) (int, int) {
-	pairs := readFile(file)
-
+	items := readFile(file)
+	l := len(items)
 	part1 := 0
-	for i, p := range pairs {
-		if compare(p.first, p.second) <= 0 {
-			part1 += i + 1
+	for i := 0; i < l; i = i + 2 {
+		if compare(items[i], items[i+1]) <= 0 {
+			part1 += (i / 2) + 1
 		}
 	}
 
 	part2 := 1
 	divider1 := &Item{0, []*Item{{0, []*Item{{2, nil}}}}}
 	divider2 := &Item{0, []*Item{{0, []*Item{{6, nil}}}}}
-	allItems := []*Item{divider1, divider2}
-	for _, p := range pairs {
-		allItems = append(allItems, p.first)
-		allItems = append(allItems, p.second)
-	}
-	sort.SliceStable(allItems, func(i, j int) bool {
-		return compare(allItems[i], allItems[j]) <= 0
+	items = append(items, divider1, divider2)
+	sort.SliceStable(items, func(i, j int) bool {
+		return compare(items[i], items[j]) <= 0
 	})
-	for i, item := range allItems {
+	for i, item := range items {
 		if compare(divider1, item) == 0 || compare(divider2, item) == 0 {
 			part2 *= (i + 1)
 		}
@@ -56,36 +47,22 @@ func run(file string) (int, int) {
 	return part1, part2
 }
 
-func readFile(file string) []*Pair {
+func readFile(file string) []*Item {
 	readFile, _ := os.Open(file)
 	scanner := bufio.NewScanner(readFile)
 	scanner.Split(bufio.ScanLines)
 
-	pairs := []*Pair{}
-	var p *Pair
-	for {
-		p = readPair(scanner)
-		if p == nil {
-			break
-		} else {
-			pairs = append(pairs, p)
+	items := []*Item{}
+	for scanner.Scan() {
+		str := scanner.Text()
+		if str != "" {
+			item, _ := readItem(str)
+			items = append(items, item)
 		}
 	}
 
 	readFile.Close()
-	return pairs
-}
-
-func readPair(scanner *bufio.Scanner) *Pair {
-	if !scanner.Scan() {
-		return nil
-	}
-	first, _ := readItem(scanner.Text())
-	scanner.Scan()
-	second, _ := readItem(scanner.Text())
-	scanner.Scan() // skip blank line separator
-
-	return &Pair{first, second}
+	return items
 }
 
 func readItem(str string) (*Item, int) {
@@ -148,11 +125,6 @@ func compareLists(a []*Item, b []*Item) int {
 		// left side run out of items, right side is greater
 		return -1
 	}
-}
-
-func (p *Pair) print() {
-	fmt.Println(p.first.toString())
-	fmt.Println(p.second.toString())
 }
 
 func (i *Item) toString() string {

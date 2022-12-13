@@ -32,13 +32,14 @@ func run(file string) (int, int) {
 		}
 	}
 
-	part2 := 1
-	divider1 := &Item{0, []*Item{{0, []*Item{{2, nil}}}}}
-	divider2 := &Item{0, []*Item{{0, []*Item{{6, nil}}}}}
+	divider1, _ := readItem("[[2]]")
+	divider2, _ := readItem("[[6]]")
 	items = append(items, divider1, divider2)
 	sort.SliceStable(items, func(i, j int) bool {
 		return compare(items[i], items[j]) <= 0
 	})
+
+	part2 := 1
 	for i, item := range items {
 		if compare(divider1, item) == 0 || compare(divider2, item) == 0 {
 			part2 *= (i + 1)

@@ -113,35 +113,13 @@ func readItem(str string) (*Item, int) {
 	return &Item{vn, vl}, idx
 }
 
-func (p *Pair) print() {
-	fmt.Println(p.first.toString())
-	fmt.Println(p.second.toString())
-}
-
-func (i *Item) toString() string {
-	str := ""
-	if i.isList() {
-		str += "["
-		for idx, si := range i.valueList {
-			if idx > 0 {
-				str += ","
-			}
-			str += si.toString()
-		}
-		str += "]"
-	} else {
-		str += fmt.Sprint(i.valueInt)
-	}
-	return str
-}
-
 func (p *Pair) compare() int {
 	return compare(p.first, p.second)
 }
 
 func compare(a *Item, b *Item) int {
 	if !a.isList() && !b.isList() {
-		return compareInts(a.valueInt, b.valueInt)
+		return a.valueInt - b.valueInt
 	} else if a.isList() && b.isList() {
 		return compareLists(a.valueList, b.valueList)
 	} else {
@@ -151,16 +129,6 @@ func compare(a *Item, b *Item) int {
 			b = &Item{0, []*Item{b}}
 		}
 		return compare(a, b)
-	}
-}
-
-func compareInts(a int, b int) int {
-	if a < b {
-		return -1
-	} else if a > b {
-		return 1
-	} else {
-		return 0
 	}
 }
 
@@ -184,4 +152,26 @@ func compareLists(a []*Item, b []*Item) int {
 		// left side run out of items, right side is greater
 		return -1
 	}
+}
+
+func (p *Pair) print() {
+	fmt.Println(p.first.toString())
+	fmt.Println(p.second.toString())
+}
+
+func (i *Item) toString() string {
+	str := ""
+	if i.isList() {
+		str += "["
+		for idx, si := range i.valueList {
+			if idx > 0 {
+				str += ","
+			}
+			str += si.toString()
+		}
+		str += "]"
+	} else {
+		str += fmt.Sprint(i.valueInt)
+	}
+	return str
 }

@@ -32,14 +32,14 @@ func run(file string) (int, int) {
 
 	part1 := 0
 	for i, p := range pairs {
-		if p.compare() <= 0 {
+		if compare(p.first, p.second) <= 0 {
 			part1 += i + 1
 		}
 	}
 
 	part2 := 1
-	divider1 := &Item{0, []*Item{&Item{0, []*Item{&Item{2, nil}}}}}
-	divider2 := &Item{0, []*Item{&Item{0, []*Item{&Item{6, nil}}}}}
+	divider1 := &Item{0, []*Item{{0, []*Item{{2, nil}}}}}
+	divider2 := &Item{0, []*Item{{0, []*Item{{6, nil}}}}}
 	allItems := []*Item{divider1, divider2}
 	for _, p := range pairs {
 		allItems = append(allItems, p.first)
@@ -111,10 +111,6 @@ func readItem(str string) (*Item, int) {
 		}
 	}
 	return &Item{vn, vl}, idx
-}
-
-func (p *Pair) compare() int {
-	return compare(p.first, p.second)
 }
 
 func compare(a *Item, b *Item) int {

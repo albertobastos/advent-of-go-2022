@@ -133,14 +133,14 @@ func runPart1(s *State) {
 				// sand will fall forever, we are done
 				return
 			}
-			if s.isEmpty(sand.x, sand.y+1) {
+			if s.isEmpty(sand.x, sand.y+1, true) {
 				// move down
 				sand.y++
-			} else if s.isEmpty(sand.x-1, sand.y+1) {
+			} else if s.isEmpty(sand.x-1, sand.y+1, true) {
 				// move left-down
 				sand.x--
 				sand.y++
-			} else if s.isEmpty(sand.x+1, sand.y+1) {
+			} else if s.isEmpty(sand.x+1, sand.y+1, true) {
 				// move right-down
 				sand.x++
 				sand.y++
@@ -156,19 +156,19 @@ func runPart1(s *State) {
 func runPart2(s *State) {
 	for {
 		sand := &XY{START_X, START_Y}
-		if !s.isEmpty(sand.x, sand.y) {
+		if !s.isEmpty(sand.x, sand.y, false) {
 			// sand source is blocked, we are done
 			return
 		}
 		for {
-			if s.isEmpty(sand.x, sand.y+1) {
+			if s.isEmpty(sand.x, sand.y+1, false) {
 				// move down
 				sand.y++
-			} else if s.isEmpty(sand.x-1, sand.y+1) {
+			} else if s.isEmpty(sand.x-1, sand.y+1, false) {
 				// move left-down
 				sand.x--
 				sand.y++
-			} else if s.isEmpty(sand.x+1, sand.y+1) {
+			} else if s.isEmpty(sand.x+1, sand.y+1, false) {
 				// move right-down
 				sand.x++
 				sand.y++
@@ -181,7 +181,7 @@ func runPart2(s *State) {
 	}
 }
 
-func (s *State) isEmpty(x int, y int) bool {
+func (s *State) isEmpty(x int, y int, ignoreFloor bool) bool {
 	xy := XY{x, y}
-	return !s.rocks[xy] && !s.sand[xy] && s.floor > y
+	return !s.rocks[xy] && !s.sand[xy] && (ignoreFloor || s.floor > y)
 }

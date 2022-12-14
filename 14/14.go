@@ -40,7 +40,6 @@ func run(file string) (int, int) {
 	runPart2(state)
 	part2 := len(state.sand)
 
-	fmt.Println("Floor:", state.floor)
 	return part1, part2
 }
 

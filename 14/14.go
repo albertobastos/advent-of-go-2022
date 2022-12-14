@@ -116,12 +116,10 @@ func (s *State) updateLimits(rock *XY) {
 }
 
 func (s *State) addRock(rock *XY) {
-	key := *rock // create a copy, rock may be modified outside
-	s.rocks[key] = true
+	s.rocks[*rock] = true // is a map[XY], so that copies the struct
 }
 
 func (s *State) addSand(sand *XY) {
-	// we know this sand will not be modified and can avoid the copy
 	s.sand[*sand] = true
 }
 

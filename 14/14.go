@@ -53,7 +53,7 @@ func readFile(file string) *State {
 		sand:       make(map[XY]bool),
 		limitLeft:  math.MaxInt,
 		limitRight: math.MinInt,
-		floor:      0,
+		floor:      START_Y - 1,
 	}
 
 	for scanner.Scan() {

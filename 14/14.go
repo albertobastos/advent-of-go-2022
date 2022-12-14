@@ -36,7 +36,7 @@ func run(file string) (int, int) {
 	runPart1(state)
 	part1 := len(state.sand)
 
-	state = readFile(file)
+	state.sand = make(map[XY]bool) // reset sand
 	runPart2(state)
 	part2 := len(state.sand)
 

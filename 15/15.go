@@ -3,13 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"regexp"
 	"strconv"
-)
-
-var (
-	RE_SENSOR = regexp.MustCompile("Sensor at x=(-?[0-9]+), y=(-?[0-9]+): closest beacon is at x=(-?[0-9]+), y=(-?[0-9]+)")
 )
 
 type Sensor struct {
@@ -21,6 +18,9 @@ type Sensor struct {
 }
 type Track [2]int
 type TrackList []Track
+
+var RE_SENSOR = regexp.MustCompile("Sensor at x=(-?[0-9]+), y=(-?[0-9]+): closest beacon is at x=(-?[0-9]+), y=(-?[0-9]+)")
+var NO_TRACK = Track{math.MaxInt, math.MaxInt}
 
 func main() {
 	part1, part2 := run(2000000, 4000000, "input.txt")
@@ -61,8 +61,8 @@ func readSensor(log string) *Sensor {
 func doPart1(sensors []*Sensor, row int) int {
 	tracks := TrackList{}
 	for _, s := range sensors {
-		if s.hasEmpties(row) {
-			t := s.getEmptyTrack(row)
+		t := s.getTrack(row, false)
+		if t != NO_TRACK {
 			tracks = mergeTracks(tracks, t)
 		}
 	}
@@ -112,16 +112,14 @@ func insert(arr TrackList, index int, elem Track) TrackList {
 	return arr
 }
 
-func (s *Sensor) hasEmpties(row int) bool {
-	if s.by == row && abs(s.y-row) == s.d {
-		// is a limit row with the beacon
-		return false
+func (s *Sensor) getTrack(row int, withBeacon bool) Track {
+	if s.y-s.d > row || s.y+s.d < row {
+		return NO_TRACK
 	}
-	return s.y-s.d <= row && s.y+s.d >= row
-}
-
-// pre: s.hasEmpties(row) == true
-func (s *Sensor) getEmptyTrack(row int) Track {
+	if !withBeacon && row == s.by && abs(s.y-row) == s.d {
+		// the beacon is the whole track
+		return NO_TRACK
+	}
 	d := abs(s.y-row) + 1
 	from, to := s.x-d, s.x+d
 	if s.by == row {

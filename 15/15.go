@@ -9,6 +9,8 @@ import (
 	"strconv"
 )
 
+const FREQ_MUL = 4000000
+
 type Sensor struct {
 	x  int // sensor x
 	y  int // sensor y
@@ -75,7 +77,41 @@ func doPart1(sensors []*Sensor, row int) int {
 }
 
 func doPart2(sensors []*Sensor, distressmax int) int {
-	return 0
+	x, y := findDistressBeacon(sensors, distressmax)
+	return x*FREQ_MUL + y
+}
+
+func findDistressBeacon(sensors []*Sensor, distressmax int) (int, int) {
+	for row := 0; row <= distressmax; row++ {
+		tracks := TrackList{}
+		for _, s := range sensors {
+			t := s.getTrack(row, true)
+			if t != NO_TRACK {
+				tracks = mergeTracks(tracks, t)
+			}
+		}
+		ltracks := len(tracks)
+		if ltracks == 0 {
+			fmt.Println("Easy case 1, suspicious...")
+			return 0, row
+		}
+		if tracks[0][0] > 0 {
+			fmt.Println("Easy case 2, suspicious...")
+			return 0, row
+		}
+		if tracks[ltracks-1][1] < distressmax {
+			fmt.Println("Easy case 3, suspicious...")
+			return distressmax, row
+		}
+		for i := 0; i < ltracks-1; i++ {
+			cand := tracks[i][1] + 1
+			if cand < tracks[i+1][0] {
+				// found it!
+				return cand, row
+			}
+		}
+	}
+	return 0, 0
 }
 
 func mergeTracks(tracks TrackList, track Track) TrackList {
@@ -120,9 +156,9 @@ func (s *Sensor) getTrack(row int, withBeacon bool) Track {
 		// the beacon is the whole track
 		return NO_TRACK
 	}
-	d := abs(s.y-row) + 1
+	d := s.d - abs(s.y-row)
 	from, to := s.x-d, s.x+d
-	if s.by == row {
+	if !withBeacon && s.by == row {
 		if s.bx == from {
 			from++
 		} else if s.bx == to {

@@ -96,10 +96,15 @@ func (s *State) hasBeacon(x int, y int) bool {
 
 func (s *State) addTrack(row int, from int, to int) {
 	rt := s.tracks[row]
-	if s.tracks[row] == nil {
-		rt = []Track{}
+	if rt == nil {
+		s.tracks[row] = []Track{[2]int{from, to}}
+		return
 	}
 
+	// merge with existing tracks, keep order based on track[0]
+	// TODO
+
+	// new track goes at the end
 	rt = append(rt, [2]int{from, to})
 	s.tracks[row] = rt
 }
@@ -130,29 +135,7 @@ func doPart1(s *State, row int) int {
 }
 
 func doPart2(s *State, distressmax int) int {
-	bx, by := findDistressBeacon(s, distressmax)
-	return bx*distressmax + by
-}
-
-func findDistressBeacon(s *State, distressmax int) (int, int) {
-	for y := 0; y <= distressmax; y++ {
-		yts := s.tracks[y]
-		sortTracks(yts)
-		last := -1
-		for _, t := range yts {
-			for x := last + 1; x < t[0] && x <= distressmax; x++ {
-				if !s.hasBeacon(x, y) {
-					return x, y
-				}
-			}
-			last = maxInt(last, t[1])
-			if last > distressmax {
-				// remaining tracks are past the max allowed, skip row
-				break
-			}
-		}
-	}
-	return 0, 0
+	return 0
 }
 
 func sortTracks(ts []Track) {

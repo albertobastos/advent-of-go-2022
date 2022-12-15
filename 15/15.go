@@ -3,28 +3,24 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
 	"os"
 	"regexp"
-	"sort"
 	"strconv"
 )
-
-const UNKNOWN = 0
-const EMPTY = 1
-const BEACON = 2
 
 var (
 	RE_SENSOR = regexp.MustCompile("Sensor at x=(-?[0-9]+), y=(-?[0-9]+): closest beacon is at x=(-?[0-9]+), y=(-?[0-9]+)")
 )
 
-type Track [2]int
-type Tracks map[int][]Track       // row -> empty tracks
-type Beacons map[int]map[int]bool // [row,col] -> has beacon
-type State struct {
-	tracks  Tracks
-	beacons Beacons
+type Sensor struct {
+	x  int // sensor x
+	y  int // sensor y
+	bx int // beacon x
+	by int // beacon y
+	d  int // distance from sensor to beacon
 }
+type Track [2]int
+type TrackList []Track
 
 func main() {
 	part1, part2 := run(2000000, 4000000, "input.txt")
@@ -33,115 +29,115 @@ func main() {
 }
 
 func run(row int, distressmax int, file string) (int, int) {
-	s := processFile(file)
-	part1 := doPart1(s, row)
-	part2 := doPart2(s, distressmax)
+	sensors := readFile(file)
+	part1 := doPart1(sensors, row)
+	part2 := doPart2(sensors, distressmax)
 	return part1, part2
 }
 
-func processFile(file string) *State {
+func readFile(file string) []*Sensor {
 	readFile, _ := os.Open(file)
 	scanner := bufio.NewScanner(readFile)
 	scanner.Split(bufio.ScanLines)
 
-	s := &State{make(Tracks), make(Beacons)}
+	list := []*Sensor{}
 	for scanner.Scan() {
-		processSensor(s, scanner.Text())
+		list = append(list, readSensor(scanner.Text()))
 	}
 
 	readFile.Close()
-	return s
+	return list
 }
 
-func processSensor(s *State, log string) {
+func readSensor(log string) *Sensor {
 	mxs := RE_SENSOR.FindStringSubmatch(log)
-	sx, _ := strconv.Atoi(mxs[1])
-	sy, _ := strconv.Atoi(mxs[2])
+	x, _ := strconv.Atoi(mxs[1])
+	y, _ := strconv.Atoi(mxs[2])
 	bx, _ := strconv.Atoi(mxs[3])
 	by, _ := strconv.Atoi(mxs[4])
-	d := getDistance(sx, sy, bx, by)
+	return &Sensor{x, y, bx, by, distance(x, y, bx, by)}
+}
 
-	s.addBeacon(bx, by)
-	for y := sy - d; y <= sy+d; y++ {
-		dx := d - abs(sy-y)
-		from := sx - dx
-		to := sx + dx
-		if y == by {
-			if from == bx {
-				from++
-			}
-			if to == bx {
-				to--
-			}
-		}
-		if to-from >= 0 {
-			s.addTrack(y, from, to)
+func doPart1(sensors []*Sensor, row int) int {
+	tracks := TrackList{}
+	for _, s := range sensors {
+		if s.hasEmpties(row) {
+			t := s.getEmptyTrack(row)
+			tracks = mergeTracks(tracks, t)
 		}
 	}
-}
-
-func (s *State) addBeacon(x int, y int) {
-	if s.beacons[y] == nil {
-		s.beacons[y] = make(map[int]bool)
-	}
-	s.beacons[y][x] = true
-}
-
-func (s *State) hasBeacon(x int, y int) bool {
-	if s.beacons[y] == nil {
-		return false
-	}
-	return s.beacons[y][x]
-}
-
-func (s *State) addTrack(row int, from int, to int) {
-	rt := s.tracks[row]
-	if rt == nil {
-		s.tracks[row] = []Track{[2]int{from, to}}
-		return
-	}
-
-	// merge with existing tracks, keep order based on track[0]
-	// TODO
-
-	// new track goes at the end
-	rt = append(rt, [2]int{from, to})
-	s.tracks[row] = rt
-}
-
-func getDistance(x1 int, y1 int, x2 int, y2 int) int {
-	return abs(x1-x2) + abs(y1-y2)
-}
-
-func doPart1(s *State, row int) int {
-	rts := s.tracks[row]
-	if rts == nil {
-		return 0
-	}
-
-	sortTracks(rts)
 
 	sum := 0
-	prev := math.MinInt
-	for _, t := range rts {
-		from := maxInt(prev+1, t[0])
-		to := t[1]
-		if to >= from {
-			sum += to - from + 1
-			prev = to
-		}
+	for _, t := range tracks {
+		sum += t[1] - t[0] + 1
 	}
 	return sum
 }
 
-func doPart2(s *State, distressmax int) int {
+func doPart2(sensors []*Sensor, distressmax int) int {
 	return 0
 }
 
-func sortTracks(ts []Track) {
-	sort.SliceStable(ts, func(i, j int) bool {
-		return ts[i][0] <= ts[j][0]
-	})
+func mergeTracks(tracks TrackList, track Track) TrackList {
+	// insert it ordered by track start
+	i := 0
+	for i < len(tracks) && tracks[i][0] < track[0] {
+		i++
+	}
+	tracks = insert(tracks, i, track)
+
+	// merge overlapping tracks
+	ntracks := TrackList{tracks[0]}
+	for _, t := range tracks[1:] {
+		curr := ntracks[len(ntracks)-1]
+		if t[0] > curr[1] {
+			// no overlap, append it
+			ntracks = append(ntracks, t)
+		} else {
+			// overlap, extend to the right
+			curr[1] = maxInt(t[1], curr[1])
+			ntracks[len(ntracks)-1] = curr
+		}
+	}
+
+	return ntracks
+}
+
+func insert(arr TrackList, index int, elem Track) TrackList {
+	if len(arr) == index {
+		return append(arr, elem)
+	}
+	arr = append(arr[:index+1], arr[index:]...)
+	arr[index] = elem
+	return arr
+}
+
+func (s *Sensor) hasEmpties(row int) bool {
+	if s.by == row && abs(s.y-row) == s.d {
+		// is a limit row with the beacon
+		return false
+	}
+	return s.y-s.d <= row && s.y+s.d >= row
+}
+
+// pre: s.hasEmpties(row) == true
+func (s *Sensor) getEmptyTrack(row int) Track {
+	d := abs(s.y-row) + 1
+	from, to := s.x-d, s.x+d
+	if s.by == row {
+		if s.bx == from {
+			from++
+		} else if s.bx == to {
+			to--
+		}
+	}
+	return Track{from, to}
+}
+
+// auxiliar functions
+
+func distance(x1 int, y1 int, x2 int, y2 int) int {
+	return abs(x1-x2) + abs(y1-y2)
 }
 
 func abs(x int) int {

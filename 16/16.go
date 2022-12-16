@@ -18,14 +18,12 @@ type ValveName string
 type Valve struct {
 	name      ValveName
 	flowRate  int
-	opened    bool
 	distances map[ValveName]int
 }
 
 type State struct {
-	valves      map[ValveName]*Valve
-	minutesLeft int
-	current     ValveName
+	valves  map[ValveName]*Valve
+	current ValveName
 }
 
 type ValveList []ValveName
@@ -80,9 +78,8 @@ func readFile(file string) *State {
 	scanner.Split(bufio.ScanLines)
 
 	s := &State{
-		valves:      make(map[ValveName]*Valve),
-		minutesLeft: INIT_MINUTES,
-		current:     INIT_VALVE,
+		valves:  make(map[ValveName]*Valve),
+		current: INIT_VALVE,
 	}
 	for scanner.Scan() {
 		readValve(s, scanner.Text())
@@ -102,7 +99,6 @@ func readValve(s *State, str string) {
 	v := Valve{
 		name:      name,
 		flowRate:  flowRate,
-		opened:    false,
 		distances: make(map[ValveName]int)}
 	v.distances[v.name] = 0
 	for _, conn := range conns {

@@ -26,32 +26,39 @@ type State struct {
 	current ValveName
 }
 
-type ValveList []ValveName
+type ValveSet map[ValveName]bool
 
-func (l ValveList) indexOf(name ValveName) int {
-	for i, n := range l {
-		if n == name {
-			return i
+func vadd(s ValveSet, name ValveName) ValveSet {
+	if s[name] {
+		return s
+	}
+	cpy := make(ValveSet)
+	for n, _ := range s {
+		cpy[n] = true
+	}
+	cpy[name] = true
+	return cpy
+}
+
+func vdel(s ValveSet, name ValveName) ValveSet {
+	if !s[name] {
+		return s
+	}
+	cpy := make(ValveSet)
+	for n, _ := range s {
+		if n != name {
+			cpy[n] = true
 		}
 	}
-	return -1
-}
-
-func vappend(l ValveList, name ValveName) ValveList {
-	return append(l, name)
-}
-
-func vremove(l ValveList, name ValveName) ValveList {
-	toRemove := l.indexOf(name)
-	if toRemove < 0 {
-		fmt.Println("Error: trying to remove Valve not in ValveList")
-		os.Exit(1)
-	}
-
-	cpy := ValveList{}
-	cpy = append(cpy, l[:toRemove]...)
-	cpy = append(cpy, l[toRemove+1:]...)
 	return cpy
+}
+
+func vinit(names ...ValveName) ValveSet {
+	s := make(ValveSet)
+	for _, n := range names {
+		s[n] = true
+	}
+	return s
 }
 
 func main() {
@@ -63,13 +70,12 @@ func main() {
 func run(file string) (int, int) {
 	state := readFile(file)
 
-	unbroken := filterNotBroken(state)
-	_, released := findOptimalRelease(
-		state, unbroken, ValveList{INIT_VALVE}, INIT_MINUTES, 0)
+	unbroken := state.getValvesWithFlow()
+	released := findOptimalRelease(
+		state, unbroken, vinit(INIT_VALVE), state.valves[INIT_VALVE], INIT_MINUTES, 0)
+	part2 := doPart2(state, unbroken)
 
-	//fmt.Println("Visited:", visited) // AA, DD, BB, JJ, HH, EE, CC
-
-	return released, -1
+	return released, part2
 }
 
 func readFile(file string) *State {
@@ -128,42 +134,45 @@ func fillDistances(s *State) {
 	}
 }
 
-func filterNotBroken(s *State) ValveList {
-	l := ValveList{}
+func (s *State) getValvesWithFlow() ValveSet {
+	r := vinit()
 	for _, v := range s.valves {
 		if v.flowRate > 0 {
-			l = append(l, v.name)
+			r[v.name] = true
 		}
 	}
-	return l
+	return r
 }
 
-func findOptimalRelease(s *State, closed ValveList, visited ValveList, minutesLeft int, releasedSoFar int) (ValveList, int) {
+func findOptimalRelease(s *State, closed ValveSet, visited ValveSet, current *Valve, minutesLeft int, releasedSoFar int) int {
 	if len(closed) == 0 || minutesLeft == 0 {
-		return visited, releasedSoFar
+		return releasedSoFar
 	}
-	current := s.valves[visited[len(visited)-1]]
-	bestVisited := visited
 	bestReleased := releasedSoFar
-	for _, vname := range closed {
+	for vname, _ := range closed {
 		minutesLeftAfterOpen := minutesLeft - current.distances[vname] - 1
 
 		if minutesLeftAfterOpen >= 0 {
-			iVisited, iReleased := findOptimalRelease(
+			v := s.valves[vname]
+			iReleased := findOptimalRelease(
 				s,
-				vremove(closed, vname),
-				vappend(visited, vname),
+				vdel(closed, vname),
+				vadd(visited, vname),
+				v,
 				minutesLeftAfterOpen,
-				releasedSoFar+minutesLeftAfterOpen*s.valves[vname].flowRate,
+				releasedSoFar+minutesLeftAfterOpen*v.flowRate,
 			)
 			if iReleased > bestReleased {
-				bestVisited = iVisited
 				bestReleased = iReleased
 			}
 		}
 	}
 
-	return bestVisited, bestReleased
+	return bestReleased
+}
+
+func doPart2(s *State, flowable ValveSet) int {
+	return 0
 }
 
 func minInt(a, b int) int {

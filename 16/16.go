@@ -39,11 +39,11 @@ func (l ValveList) indexOf(name ValveName) int {
 	return -1
 }
 
-func (l ValveList) append(name ValveName) ValveList {
+func vappend(l ValveList, name ValveName) ValveList {
 	return append(l, name)
 }
 
-func (l ValveList) remove(name ValveName) ValveList {
+func vremove(l ValveList, name ValveName) ValveList {
 	toRemove := l.indexOf(name)
 	if toRemove < 0 {
 		fmt.Println("Error: trying to remove Valve not in ValveList")
@@ -155,8 +155,8 @@ func findOptimalRelease(s *State, closed ValveList, visited ValveList, minutesLe
 		if minutesLeftAfterOpen >= 0 {
 			iVisited, iReleased := findOptimalRelease(
 				s,
-				closed.remove(vname),
-				visited.append(vname),
+				vremove(closed, vname),
+				vappend(visited, vname),
 				minutesLeftAfterOpen,
 				releasedSoFar+minutesLeftAfterOpen*s.valves[vname].flowRate,
 			)

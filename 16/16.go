@@ -28,6 +28,24 @@ type State struct {
 
 type ValveSet map[ValveName]bool
 
+func (s ValveSet) asSlice() []ValveName {
+	l := []ValveName{}
+	for n, _ := range s {
+		l = append(l, n)
+	}
+	return l
+}
+
+func (s ValveSet) comp(a ValveSet) ValveSet {
+	c := make(ValveSet)
+	for n, _ := range s {
+		if !a[n] {
+			c[n] = true
+		}
+	}
+	return c
+}
+
 func vadd(s ValveSet, name ValveName) ValveSet {
 	if s[name] {
 		return s
@@ -73,7 +91,8 @@ func run(file string) (int, int) {
 	unbroken := state.getValvesWithFlow()
 	released := findOptimalRelease(
 		state, unbroken, vinit(INIT_VALVE), state.valves[INIT_VALVE], INIT_MINUTES, 0)
-	part2 := doPart2(state, unbroken)
+	// TODO: test works, but real input takes forever
+	part2 := -1 // doPart2(state, unbroken)
 
 	return released, part2
 }
@@ -172,11 +191,50 @@ func findOptimalRelease(s *State, closed ValveSet, visited ValveSet, current *Va
 }
 
 func doPart2(s *State, flowable ValveSet) int {
-	return 0
+	minutes := INIT_MINUTES - 4
+	initOpened := vinit(INIT_VALVE)
+	initValve := s.valves[INIT_VALVE]
+
+	combs := [][2]ValveSet{}
+	ss := findAllSubsets(flowable.asSlice(), len(flowable)/2)
+	for _, sub := range ss {
+		combs = append(combs, [2]ValveSet{sub, flowable.comp(sub)})
+	}
+
+	max := 0
+	for _, comb := range combs {
+		max = maxInt(max, findOptimalRelease(s, comb[0], initOpened, initValve, minutes, 0)+findOptimalRelease(s, comb[1], initOpened, initValve, minutes, 0))
+	}
+
+	return max
+}
+
+func findAllSubsets(all []ValveName, n int) []ValveSet {
+	r := []ValveSet{}
+	if n == 0 {
+		r = append(r, vinit())
+		return r
+	}
+
+	for i, e := range all {
+		for _, sr := range findAllSubsets(append(all[:i], all[i+1:]...), n-1) {
+			r = append(r, vadd(sr, e))
+		}
+	}
+
+	return r
 }
 
 func minInt(a, b int) int {
 	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func maxInt(a, b int) int {
+	if a > b {
 		return a
 	} else {
 		return b

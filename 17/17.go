@@ -26,6 +26,7 @@ func main() {
 func run(file string) (int, int) {
 	jets := readFile(file)
 	part1 := playRounds(jets, ROUNDS_PART1)
+	fmt.Println("jets:", len(jets))
 	// runs forever
 	part2 := -1 // playRounds(jets, ROUNDS_PART2)
 	return part1, part2
@@ -34,13 +35,14 @@ func run(file string) (int, int) {
 func playRounds(jets Jets, rounds int) int {
 	floor := Floor{}
 	stall := []Point{}
-	pi := -1
-	for i := 0; i < rounds; i++ {
-		r := newRock(i, floor)
+	ji := -1
+	for ri := 0; ri < rounds; ri++ {
+		r := newRock(ri, floor)
+		//fmt.Println("round", i, "of", rounds)
 		felt := true
 		for felt {
-			pi = (pi + 1) % len(jets)
-			rockPush(stall, r, jets[pi])
+			ji = (ji + 1) % len(jets)
+			rockPush(stall, r, jets[ji])
 			felt = rockDown(stall, r)
 			//printState(stall, r)
 			if !felt {
@@ -51,12 +53,12 @@ func playRounds(jets Jets, rounds int) int {
 		for _, p := range stall {
 			floor[p[0]] = maxInt(floor[p[0]], p[1])
 		}
-		//printState(stall, r)
 	}
 	maxh := 0
 	for _, x := range floor {
 		maxh = maxInt(maxh, x)
 	}
+	//printState(stall, nil)
 	return maxh
 }
 

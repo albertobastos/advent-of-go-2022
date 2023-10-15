@@ -104,11 +104,11 @@ func maximumGeodes(b *Blueprint, minutes int) int {
 	inv := Inventory{
 		robotsOre: 1,
 	}
-	return maximumGeodesDPS(b, &inv, minutes, 0)
+	return maximumGeodesDPS(b, &inv, minutes)
 }
 
 func maximumGeodesDPS(b *Blueprint, inv *Inventory, minutesLeft int) int {
-	fmt.Println("bp", b.id, ",", minutesLeft, "minutes left", inv)
+	//fmt.Println("bp", b.id, ",", minutesLeft, "minutes left", inv)
 	if minutesLeft == 0 {
 		return inv.geode
 	}
